@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>A Gold Star</title>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+    
+    <!-- 顶点 Sharder 程序  | Vertex Shader Program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es     // 使用GLSL ES 3.0 版本 | Use GLSL ES 3.0 version
+        in vec4 a_Position; // 顶点位置属性 | vertex position attribute
+        void main(){
+            gl_Position = a_Position;   // 内建变量, 输出顶点位置 | Built-in variables, output vertex positions
+            gl_PointSize = 5.0;         // 内建变量, 设置点的大小 | Built-in variables to set the size of the point
+        }
+    </script>
+    <!-- 片元 Sharder 程序  | Fragment Shader Program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es     // 使用GLSL ES 3.0 版本 | Use GLSL ES 3.0 version
+        precision mediump float;    // 设置浮点数精度为中等 | Set the floating point precision to medium
+        out vec4 fColor;    // 输出片元颜色 | Output fragment color
+        void main(){
+            // 片元颜色, 不透明 | Fragment color, opaque
+            fColor=vec4(0.99, 0.84, 0.25, 1.0);
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp1-1Star.js"></script>
+</body>
+
+</html>
