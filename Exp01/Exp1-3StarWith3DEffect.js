@@ -44,7 +44,6 @@ window.onload = () => {
     // 获取名称为"a_Position"的shader属性变量 | Get the shader attribute variable named "a_Position"
     const a_PositionLoc = gl.getAttribLocation(program, "a_Position");
     if (a_PositionLoc < 0) { alert("Failed to get a_Position"); return; }
-
     // 将缓冲区中的数据传递给顶点着色器中的a_Position变量 | Pass the data in the buffer to the a_Position variable in the vertex shader
     gl.vertexAttribPointer(a_PositionLoc, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_PositionLoc);// 启用顶点着色器中的a_Position变量 | Enable the a_Position variable in the vertex shader
@@ -52,9 +51,9 @@ window.onload = () => {
     const colorsBufferID = gl.createBuffer();       // 创建颜色缓冲区 | Create a color buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, colorsBufferID); // 绑定颜色缓冲区 | Bind a color buffer
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);    // 向缓冲区写入颜色数据 | Write color data to the buffer
+    
     const a_ColorLoc = gl.getAttribLocation(program, "a_Color");        // 获取顶点着色器中的a_Color变量 | get the a_Color variable in the vertex shader
     if (a_ColorLoc < 0) { alert("Failed to get a_Color"); return; }
-
     // 将缓冲区中的数据传递给顶点着色器中的a_Color变量 | Pass the data in the buffer to the a_Color variable in the vertex shade
     gl.vertexAttribPointer(a_ColorLoc, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_ColorLoc); // 启用顶点着色器中的a_Color变量 | Enable the a_Color variable in the vertex shader

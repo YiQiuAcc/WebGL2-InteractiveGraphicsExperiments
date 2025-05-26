@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>3D octahedron sierpinski Volume subdivision</title>
+    <style>
+        .notice {
+            background-color: #1795bb;
+            border: none;
+            color: white;
+            padding: 10px 10px;
+            max-width: 590px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+    <br>
+    <label class="notice">Click the left mouse button to increase the number of subdivisions,
+        click the right button to decrease it. (0-5) Currently:
+        <div id="iterations" style="display: inline-block;"></div>
+        <br>
+        Use arrow keys to control rotation
+    </label>
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        // 模型视图投影矩阵 - 用于将顶点坐标转换为裁剪空间坐标
+        // ModelViewProjectionMatrix - used to transform vertex coordinates into clip space coordinates
+        uniform mat4 u_matMVP;
+        in vec3 a_Position;
+        in vec3 a_Color;
+        out vec4 v_Color;
+        void main() {
+            // 计算顶点在裁剪空间中的位置 | Calculate the position of the vertex in clip space
+            gl_Position = u_matMVP * vec4(a_Position, 1.0);
+            v_Color = vec4(a_Color, 1.0);
+        }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+        precision mediump float;
+        in vec4 v_Color;
+        out vec4 fcolor;
+        void main() {
+            fcolor = v_Color;
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp2-5Sierpinski3DOctahedron.js"></script>
+</body>
+
+</html>

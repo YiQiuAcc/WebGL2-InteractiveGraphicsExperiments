@@ -24,10 +24,10 @@
     <script id="fragment-shader" type="x-shader/x-fragment">
         #version 300 es     // 使用GLSL ES 3.0 版本 | Use GLSL ES 3.0 version
         precision mediump float;    // 设置浮点数精度为中等 | Set the floating point precision to medium
-        out vec4 fColor;    // 输出片元颜色 | Output fragment color
+        out vec4 f_Color;    // 输出片元颜色 | Output fragment color
         void main(){
             // 片元颜色, 不透明 | Fragment color, opaque
-            fColor=vec4(0.99, 0.84, 0.25, 1.0);
+            f_Color=vec4(1.0, 0.84, 0.25, 1.0);
         }
     </script>
 
