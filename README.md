@@ -8,6 +8,7 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 ### 🧪 Current Experiments
 - **Exp01**: Basic shape rendering experiments
 - **Exp02**: Drawing of fractal graphics
+- **Exp03**: Animation and interactive
 
 ## 🛠️ Technologies Used
 - WebGL 2.0
@@ -21,5 +22,7 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 ├── README.md
 ├── Utils/      # Utility files
 ├── Exp01/      # Experiment 1 files
-└── Exp02/      # Experiment 2 files
+├── Exp02/      # Experiment 2 files
+├── ...
+└── 
 ```

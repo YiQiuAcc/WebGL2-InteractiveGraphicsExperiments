@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Starfish Twist Animation</title>
+    <style>
+        #controls {
+            position: fixed;
+            bottom: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+
+    <div id="controls">
+        <label>The up, down, left, and right arrow keys control the intensity and speed.</label>
+        <label>Adjust the intensity</label>
+        <input type="range" id="strengthControl" min="0" max="100" value="35">
+        <button id="reset">Reset</button>
+    </div>
+
+    <!-- 顶点 Sharder 程序 | Vertex Shader Program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec2 a_Position;
+        uniform mat4 u_matProj;          // 投影矩阵 | Projection matrix
+        uniform float u_Time;            // 时间参数 | Time parameter
+        uniform float u_TwistStrength;   // 扭曲强度 | Twist strength
+        void main() {
+            vec4 pos = vec4(a_Position, 0, 1);
+            float radius = length(pos.xy);                  // 计算半径 | Calculate radius
+            float wave = sin(radius * 2.0 + u_Time * 0.002);// 计算波纹效果 | Calculate wave effect
+            float twistAngle = u_TwistStrength * wave;      // 计算扭曲角度 | Calculate twist angle
+            float angle = atan(pos.y, pos.x) + twistAngle;  // 计算角度 | Calculate angle
+            radius *= 1.0 + 0.3 * sin(5.0 * angle);         // 计算扭曲后的半径 | Calculate the radius after distortion
+            pos.x = radius * cos(angle);                    // 计算扭曲后的x坐标 | Calculate the x coordinate after distortion
+            pos.y = radius * sin(angle);                    // 计算扭曲后的y坐标 | Calculate the y coordinate after distortion
+            gl_Position = u_matProj * pos;
+        }
+    </script>
+    <!-- 片元 Sharder 程序 | Fragment Shader Program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+        precision highp float;
+        uniform float u_Time;   // 利用速度控制调整时间值 | Adjust time value using speed
+        out vec4 fcolor;
+        vec3 rgbLoop(float t) { 
+            return vec3(0.5 + 0.5 * sin(t), 0.5 + 0.5 * sin(t + 2.0*3.14159/3.0),
+                    0.5 + 0.5 * sin(t + 4.0*3.14159/3.0)); 
+        }
+        void main() {
+            fcolor = vec4(rgbLoop(u_Time * 0.003), 1.0);
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp3-2StarfishAnimation.js"></script>
+</body>
+
+</html>

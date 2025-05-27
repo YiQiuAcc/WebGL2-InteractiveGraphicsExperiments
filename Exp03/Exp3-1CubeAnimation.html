@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Cube Animation</title>
+    <style>
+        #controls {
+            margin-top: 5px;
+        }
+
+        button,
+        select {
+            margin-right: 10px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+
+    <div id="controls">
+        <button id="slowdown">Slow down</button>
+        <button id="hurryup">Speed up</button>
+        <select id="color-menu">
+            <option value="1,1,1">White</option>
+            <option value="1,0,0">Red</option>
+            <option value="0,1,0">Green</option>
+            <option value="0,0,1">Blue</option>
+            <option value="1,1,0">Yellow</option>
+        </select>
+    </div>
+
+    <!-- 顶点 Sharder 程序 | Vertex Shader Program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec2 a_Position;
+        uniform mat4 u_matProj;
+        uniform float u_Angle;
+        void main() {
+            vec4 pos = vec4(a_Position, 0, 1);
+            float rad = radians(u_Angle);
+            pos.x = a_Position.x * cos(rad) - a_Position.y * sin(rad);
+            pos.y = a_Position.x * sin(rad) + a_Position.y * cos(rad);
+            gl_Position = u_matProj * pos;
+        }
+    </script>
+    <!-- 片元 Sharder 程序 | Fragment Shader Program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es 
+        precision mediump float;
+        uniform vec3 u_Color;
+        out vec4 fcolor;
+        void main() {
+            fcolor = vec4(u_Color,1.0);
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp3-1CubeAnimation.js"></script>
+</body>
+
+</html>
