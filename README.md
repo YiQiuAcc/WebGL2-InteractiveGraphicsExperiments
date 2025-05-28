@@ -8,7 +8,8 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 ### 🧪 Current Experiments
 - **Exp01**: Basic shape rendering experiments
 - **Exp02**: Drawing of fractal graphics
-- **Exp03**: Animation and interactive
+- **Exp03**: Animation
+- **Exp04**: Mouse Interaction
 
 ## 🛠️ Technologies Used
 - WebGL 2.0
