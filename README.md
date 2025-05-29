@@ -10,6 +10,7 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 - **Exp02**: Drawing of fractal graphics
 - **Exp03**: Animation
 - **Exp04**: Mouse Interaction
+- **Exp05**: Indexing arrays, interpolation, and morphing
 
 ## 🛠️ Technologies Used
 - WebGL 2.0

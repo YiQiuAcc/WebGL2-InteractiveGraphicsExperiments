@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Cube Morph</title>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+    <br>
+    <div>Click the left, middle or right mouse button to change the rotation direction</div>
+    <!-- 顶点 Sharder 程序 | Vertex Shader Program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_Position;
+        uniform mat4 u_MVPMatrix;   // 模视投影矩阵 | Model-View-Projection matrix
+        uniform float u_Time;
+        uniform mediump float u_MinDist;
+        out float v_Dist;           // 当前顶点到立方体中心的距离 | Distance to the cube center
+        void main(){
+            float a = u_Time;
+            if(u_Time > 1.0) a = 2.0 - u_Time; // a在[0,1]区间循环 | a in [0,1]
+            v_Dist = length(a_Position);
+            float newLength = mix(v_Dist, u_MinDist, a);
+            float zoom = newLength / v_Dist;
+            // 计算裁剪坐标系下坐标 | Calculate the clip-space coordinate
+            gl_Position = u_MVPMatrix * vec4(a_Position * zoom, 1.0);	
+        }
+    </script>
+    <!-- 片元 Sharder 程序 | Fragment Shader Program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es             // 使用GLSL ES 3.0版本 | Use GLSL ES 3.0
+        precision mediump float;    // 浮点数精度为中等 | Precision is medium
+        in float v_Dist;            // 当前片元到立方体中心的距离 | Distance to the cube center
+        uniform float u_MinDist;    // 立方体表面到立方体中心的最小距离 | Minimum distance from the cube surface to the cube center
+        uniform float u_MaxDist;    // 立方体表面到立方体中心的最大距离 | Maximum distance from the cube surface to the cube center
+        out vec4 fColor;            // 输出片元颜色 | Output fragment color
+        void main(){
+            fColor = mix(
+                vec4(0, 0, 0, 1),
+                vec4(0.12, 0.56, 0.9, 1),
+                (v_Dist - u_MinDist) / (u_MaxDist - u_MinDist)
+            );
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp5-1CubeMorph.js"></script>
+</body>
+
+</html>
