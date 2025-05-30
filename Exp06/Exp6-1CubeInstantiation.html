@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Cube Instantiation</title>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+    <br>
+    <div>Use arrow key to rotate these cubes</div>
+    <!-- 顶点 Sharder 程序 | Vertex Shader Program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec2 a_Position;
+        out float v_Dist;           // 当前顶点到立方体中心的距离 | Distance to the cube center
+        uniform mat4 u_MVPMatrix;   // 模视投影矩阵 | Model-View-Projection matrix
+
+        void main(){
+            // 因为正方形中心即为原点，到正方形中心的距离即为到原点的距离
+            // Because the center of the square is the origin, the distance from the square center to the origin is the distance from the origin to the current vertex
+            // 也即从原点指向当前顶点所构成向量的长度
+            // that is, the length of the vector from the origin to the current vertex
+            v_Dist = length(a_Position);
+            // 计算裁剪坐标系下坐标 | Calculate the clip-space coordinate
+            gl_Position = u_MVPMatrix * vec4(a_Position, 0.0, 1.0);	
+        }
+    </script>
+    <!-- 片元 Sharder 程序 | Fragment Shader Program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es             // 使用GLSL ES 3.0版本 | Use GLSL ES 3.0
+        precision mediump float;    // 浮点数精度为中等 | Precision is medium
+        in float v_Dist;            // 当前片元到立方体中心的距离 | Distance to the cube center
+        out vec4 f_Color;            // 输出片元颜色 | Output fragment color
+        uniform float u_MaxDist;	// 正方形内一点到正方形中心的最大距离 | Maximum distance from one point in the square to the square center
+        uniform vec4 u_StartColor;  // 起始颜色 | Start color
+        uniform vec4 u_EndColor;    // 终止颜色 | End color
+
+        void main(){
+            f_Color = mix(
+                u_StartColor,
+                u_EndColor,
+                v_Dist / u_MaxDist  // 根据距离确定的[0,1]范围参数 | Range parameter determined by distance
+                );
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp6-1CubeInstantiation.js"></script>
+</body>
+
+</html>

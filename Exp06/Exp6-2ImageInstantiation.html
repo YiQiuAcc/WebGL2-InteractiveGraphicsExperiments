@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Image Instantiation</title>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+    <br>
+    <div id="notices">
+        Use arrow keys to rotate, spacebar to pause, mouse wheel to zoom
+        <br>
+        <button id="pause">Pause</button>
+        Resize<input type="range" min="0.2" max="4.0" value="0.8" step="0.1" id="resize">
+    </div>
+    <!-- 顶点 Sharder 程序 | Vertex Shader Program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec2 a_Position;
+        out float v_Dist;           // 当前顶点到立方体中心的距离 | Distance to the cube center
+        uniform mat4 u_MVPMatrix;   // 模视投影矩阵 | Model-View-Projection matrix
+
+        void main(){
+            v_Dist = length(a_Position);
+            // 计算裁剪坐标系下坐标 | Calculate the clip-space coordinate
+            gl_Position = u_MVPMatrix * vec4(a_Position, 0.0, 1.0);	
+        }
+    </script>
+    <!-- 片元 Sharder 程序 | Fragment Shader Program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es             // 使用GLSL ES 3.0版本 | Use GLSL ES 3.0
+        precision mediump float;    // 浮点数精度为中等 | Precision is medium
+        uniform vec4 u_Color;
+        out vec4 f_Color;           // 输出片元颜色 | Output fragment color
+
+        void main(){
+            f_Color = u_Color;
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp6-2ImageData.js"></script>
+    <script src="./Exp6-2ImageInstantiation.js"></script>
+</body>
+
+</html>

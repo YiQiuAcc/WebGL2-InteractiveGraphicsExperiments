@@ -11,6 +11,7 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 - **Exp03**: Animation
 - **Exp04**: Mouse Interaction
 - **Exp05**: Indexing arrays, interpolation, and morphing
+- **Exp06**: Instanced Transformations
 
 ## 🛠️ Technologies Used
 - WebGL 2.0
