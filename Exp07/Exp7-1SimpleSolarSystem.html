@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Simple Solar System</title>
+    <style>
+        #notices {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 15px;
+            max-width: 970px;
+            border-radius: 8px;
+            font-size: 18px;
+            color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="1000" height="700">
+        Your browser does not support the canvas element of html 5
+    </canvas>
+    <div id="notices">Press the "r" key to start and stop the animation, "s" key to step through the animation
+        The up and down arrows are used to control the time interval between each frame in the animation.
+    </div>
+    <!-- 顶点 Sharder 程序 | Vertex Shader Program -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_Position;         // 输入三维顶点坐标 |  Input three-dimensional vertex coordinates
+        uniform mat4 u_MVPMatrix;   // 模视投影矩阵  | Model-View-Projection matrix
+        void main(){
+            // 计算裁剪坐标系下坐标 | Calculate the clip-space coordinate
+            gl_Position = u_MVPMatrix * vec4(a_Position, 1.0);
+        }
+    </script>
+    <!-- 片元 Sharder 程序 | Fragment Shader Program -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+        precision mediump float;
+        uniform vec3 u_Color;
+        out vec4 fColor;
+        void main(){
+            fColor = vec4(u_Color, 1.0);
+        }
+    </script>
+
+    <script src="../Utils/initShaders.js"></script>
+    <script src="../Utils/MV.js"></script>
+    <script src="./Exp7-1SimpleSolarSystem.js"></script>
+</body>
+
+</html>
