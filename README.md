@@ -16,6 +16,7 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 - **Exp08**: Build a 3D scene camera walkthrough
 - **Exp09**: Pick up objects and create a board game
 - **Exp10**: Phong shading
+- **Exp11**: Texture
 
 ## 🛠️ Technologies Used
 - WebGL 2.0

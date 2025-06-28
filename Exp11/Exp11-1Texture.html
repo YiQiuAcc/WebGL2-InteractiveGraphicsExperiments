@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Applying Texture to the Cube</title>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support HTML5 canvas elements!
+    </canvas>
+    <p>Direction keys control viewpoint</p>
+    <div>
+        Material:
+        <!--size is the number of entries that are directly visible-->
+        <select id="material" size="1">
+            <option value="0">橡木 | Oak</option>
+            <option value="1">樱桃木 | Cherry</option>
+            <option value="2">胡桃木 | Walnut</option>
+            <option value="3">枫木 | Maple/option>
+            <option value="4">桃花心木 | Mahogany</option>
+        </select>
+    </div>
+    <!--Fragment illumination calculation-->
+    <!--Vertex Shader Program-->
+    <script id="vertex-fShading" type="x-shader/x-vertex">
+        #version 300 es     // 使用GLSL ES 3.0版本 | Using GLSL ES 3.0 version
+        in vec2 a_Texcoord; // 顶点纹理坐标 | Vertex texture coordinates
+        in vec3 a_Position; // 输入三维顶点坐标(建模坐标系) | Input 3D vertex coordinates (modeling coordinate system)
+        in vec3 a_Normal;   // 顶点法向(建模坐标系) | Vertex normal (modeling coordinate system)
+
+        out vec2 v_Texcoord;    // 输出纹理坐标 | Output texture coordinates
+        out vec3 v_fN;          // 法向(观察坐标系) | Normal (viewing coordinate system)
+        out vec3 v_fE;          // 观察向量(观察坐标系) | View vector (viewing coordinate system)
+        out vec3 v_fL;          // 光照向量(观察坐标系) | Light vector (viewing coordinate system)
+
+        uniform mat4 u_matModel;        // 模型矩阵 | Model matrix
+        uniform mat4 u_matView;         // 观察矩阵 | View matrix
+        uniform mat4 u_Projection;      // 投影矩阵 | Projection matrix
+        uniform mat3 u_NormalMat;       // 法向变换矩阵 | Normal transformation matrix
+        uniform vec4 u_LightPosition;   // 光源位置/方向(世界坐标系) | Light source position/direction (world coordinate system)
+
+        void main() {
+            // 将顶点坐标转到观察坐标系下(在观察坐标系计算光照)
+            // Convert vertex coordinates to viewing coordinate system (calculate lighting in viewing coordinate system)
+            vec3 pos = (u_matView * u_matModel * vec4(a_Position, 1.0f)).xyz;
+            v_fE = normalize(-pos);    // 观察者方向向量 | Viewer direction vector
+            // 计算观察坐标系下法向 | Calculate the normal vector in the viewing coordinate system
+            v_fN = normalize(u_NormalMat * a_Normal);
+
+            v_fL = (u_matView * u_LightPosition).xyz;  // 从顶点指向光源的向量(观察坐标系) | From the vertex to the light vector (viewing coordinate system)
+            if(u_LightPosition.w != 0.0f)   // 近距离光源 | Near-distance light
+                v_fL = v_fL - pos.xyz;
+            v_fL = normalize(v_fL);     // 归一化 | Normalize
+            v_Texcoord = a_Texcoord;
+            // 裁剪坐标系下顶点坐标 | Vertex coordinates in clipping coordinate system
+            gl_Position = u_Projection * vec4(pos, 1.0f);
+        }
+    </script>
+
+    <!--Fragment Shader Program-->
+    <script id="fragment-fShading" type="x-shader/x-fragment">
+        #version 300 es             // 使用GLSL ES 3.0版本 | Use GLSL ES 3.0 version
+        precision mediump float;    // 浮点数精度为中等 | Floating point precision is medium
+        in vec2 v_Texcoord;         // 输入片元纹理坐标 | Input fragment texture coordinates
+        in vec3 v_fN;               // 法向(观察坐标系) | Normal (view coordinate system)
+        in vec3 v_fE;               // 观察向量(观察坐标系) | View vector (view coordinate system)
+        in vec3 v_fL;               // 光照向量(观察坐标系) | Light vector (view coordinate system)
+
+        out vec4 f_Color;           // 输出片元颜色 | Output fragment color
+
+        uniform float u_Shininess;  // 高光系数 | Specular coefficient
+        // 光源亮度与材质反射系数的乘积 | Product of the brightness of the light and the reflection coefficient of the material
+        uniform vec3 u_AmbientProduct, u_DiffuseProduct, u_SpecularProduct;
+        uniform sampler2D u_Sampler;// 2D纹理采样器 | 2D texture sampler
+
+        void main() {
+            // 归一化输入的向量 | Normalize input vectors
+            vec3 N = normalize(v_fN);
+            vec3 E = normalize(v_fE);
+            vec3 L = normalize(v_fL);
+            vec3 H = normalize(L + E);  // 半角向量 | Half vector
+
+            vec3 ambient = u_AmbientProduct; // 环境反射分量 | Ambient reflection component
+            // 漫反射分量 | Diffuse reflection component
+            float Kd = max(dot(L, N), 0.0f);
+            vec3 diffuse = Kd * u_DiffuseProduct;
+            // 镜面反射分量 | Specular reflection component
+            vec3 specular;
+            if(Kd == 0.0f) { // dot(L, N) <= 0
+                specular = vec3(0.0f, 0.0f, 0.0f);
+            } else {
+                float Ks = pow(max(dot(N, H), 0.0f), u_Shininess);
+                specular = Ks * u_SpecularProduct;
+            }
+            // 得到最终颜色(分量值超过1为自动截断) | Get the final color (the component value exceeds 1 is automatically truncated)
+            vec4 fragColor = vec4(ambient + diffuse + specular, 1.0f);
+            f_Color = fragColor * texture(u_Sampler, v_Texcoord) + (vec4(specular, 1.0f) * 0.2f);
+        }
+    </script>
+
+    <script type="text/javascript" src="../Utils/initShaders.js"></script>
+    <script type="text/javascript" src="../Utils/MV.js"></script>
+    <script type="text/javascript" src="./Exp11-1Texture.js"></script>
+</body>
+
+</html>
