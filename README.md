@@ -13,6 +13,8 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 - **Exp05**: Indexing arrays, interpolation, and morphing
 - **Exp06**: Instanced Transformations
 - **Exp07**: Draw the solar system using the MVP Matrix stack
+- **Exp08**: Build a 3D scene camera walkthrough
+- **Exp09**: Pick up objects and create a board game
 
 ## 🛠️ Technologies Used
 - WebGL 2.0

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Gobang Game</title>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="1000" height="700">
+        Your browser does not support HTML5 canvas elements!
+    </canvas>
+    <p>Gobang with animation effect, the direction key controls the viewpoint</p>
+    <!--Vertex Shader Program-->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_Position;
+        uniform mat4 u_MVPMatrix;
+        void main(){
+            gl_Position = u_MVPMatrix * vec4(a_Position, 1.0);	
+        }
+    </script>
+    <!--Fragment Shader Program-->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+        precision mediump float;
+        uniform vec4 u_Color;
+        out vec4 fColor;
+        void main(){
+            fColor = u_Color;
+        }
+    </script>
+    <script type="text/javascript" src="../Utils/initShaders.js"></script>
+    <script type="text/javascript" src="../Utils/MV.js"></script>
+    <script type="text/javascript" src="./Exp9-1Gobang.js"></script>
+</body>
+
+</html>

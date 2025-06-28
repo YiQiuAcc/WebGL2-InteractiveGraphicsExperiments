@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Othello Game</title>
+    <style>
+        p {
+            margin: 5px;
+        }
+
+        .info {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 0px 10px;
+            border-radius: 8px;
+            font-size: 18px;
+            color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="700" height="700">
+        Your browser does not support HTML5 canvas elements!
+    </canvas>
+    <div class="info">
+        <p><span id="notice"></span></p>
+        <p style="word-wrap:break-word; max-width: 670px;">
+            Black and white flip chess game rules:
+            When the fallen chess piece is completely surrounded by other pieces of the same color in rows, columns, or
+            diagonal lines (there is no blank position in the middle)
+            Another color of chess pieces can be flipped.
+        </p>
+        <p>Current turn:<span id="turn"></span></p>
+    </div>
+    <!--Vertex Shader Program-->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_Position;
+        uniform mat4 u_MVPMatrix;
+        void main(){
+            gl_Position = u_MVPMatrix * vec4(a_Position, 1.0);	
+        }
+    </script>
+    <!--Fragment Shader Program-->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+        precision mediump float;
+        uniform vec4 u_Color;
+        out vec4 fColor;
+        void main(){
+            fColor = u_Color;
+        }
+    </script>
+    <script type="text/javascript" src="../Utils/initShaders.js"></script>
+    <script type="text/javascript" src="../Utils/MV.js"></script>
+    <script type="text/javascript" src="./Exp9-2Othello.js"></script>
+</body>
+
+</html>
