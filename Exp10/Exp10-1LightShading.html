@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Draw a cube shading using Phong</title>
+</head>
+
+<body><!--Document Body-->
+    <!--The id, width and height of the drawing area. Graphics drawn with WebGL will be displayed in this canvas.-->
+    <canvas id="gl-canvas" width="600" height="600">
+        Your browser does not support HTML5 canvas elements! <!--Show this sentence when something goes wrong-->
+    </canvas>
+    <p>Use wasd or arrow keys to rotate the block, default is vertex lighting calculation</p>
+    <button class="btn" id="btn-vShading">Use vertex lighting calculations</button>
+    <button class="btn" id="btn-fShading">Use fragment lighting calculations</button>
+    <select id="changeMtl">
+        <option value="Brass">Brass</option>
+        <option value="Gold">Gold</option>
+        <option value="Silver">Silver</option>
+        <option value="Jade">Jade</option>
+    </select>
+
+    <!--The following are the shader programs and JavaScript programs used. The program type is determined by the type attribute.
+    The vertex shader program and the fragment shader program have ids because they need to be accessed in the JavaScript program, and the JavaScript program has no id-->
+    <!--Vertex lighting calculation-->
+    <!--Vertex shader program-->
+    <script id="vertex-vShading" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_Position;
+        in vec3 a_Normal;
+        out vec3 v_Color;	// 顶点光照计算得到的颜色 | Color calculated by vertex lighting
+
+        uniform vec4 u_LightPosition;	// 光源位置/方向(世界坐标系) | Light source position/direction (in world coordinates)
+        uniform float u_Shininess;		// 高光系数 | Highlight coefficient
+        // 光源亮度与材质反射系数的乘积 | The product of the light source brightness and the material reflection coefficient
+        uniform vec3 u_AmbientProduct, u_DiffuseProduct, u_SpecularProduct;
+        uniform mat4 u_matModel;    // 模型矩阵 | Model matrix
+        uniform mat4 u_matView;     // 观察矩阵 | View matrix
+        uniform mat4 u_matProj;     // 投影矩阵 | Projection matrix
+        uniform mat3 u_matNormal;   // 法线变换矩阵 | Normal transformation matrix
+
+        void main(){
+            mat4 ModelView = u_matView * u_matModel;	// 模型视图矩阵 | Model-view matrix
+            vec3 pos =  (ModelView * vec4(a_Position, 1.0)).xyz;
+            vec3 L;	// 光源方向向量(从顶点指向光源) | Source direction vector (in world coordinates)
+            if(u_LightPosition.w != 0.0){   // 近距离光源 | Near-distance light
+                L = normalize((u_matView * u_LightPosition).xyz - pos);
+            } else {    // 远距离光源 | Far-distance light
+                L = normalize(u_matView * u_LightPosition).xyz;
+            }
+            // 观察者向量(从顶点处指向观察者, 即观察坐标系原点)
+            // Observer vector (pointing from the vertex to the observer, i.e. the origin of the observation coordinate system)
+            vec3 E = normalize(-pos);
+            vec3 H = normalize(L + E);  // 半角向量 | Half-angle vector
+            // 计算观察坐标系下的法向 | Normal vector in the observation coordinate system
+            vec3 N = normalize(u_matNormal * a_Normal);
+            // 环境反射分量 | Ambient component
+            vec3 ambient = u_AmbientProduct;
+            // 漫反射分量 | Diffuse component
+            float Kd = max(dot(N, L), 0.0);
+            vec3 diffuse = u_DiffuseProduct * Kd;
+            // 镜面反射分量 | Specular component
+            vec3 specular;
+            if(Kd == 0.0){ specular = vec3(0.0, 0.0, 0.0); }    // dot(L, N) <= 0
+            else {
+                float Ks = pow(max(dot(N, H), 0.0), u_Shininess);
+                specular = Ks * u_SpecularProduct;
+            }
+            gl_Position = u_matProj * vec4(pos, 1.0);
+            v_Color = ambient + diffuse + specular;
+        }
+
+    </script>
+
+    <!--Fragment Shader Program-->
+    <script id="fragment-vShading" type="x-shader/x-fragment">
+        #version 300 es
+        precision mediump float;
+        in vec3 v_Color;    // 插值得到的片元颜色 | Color calculated by interpolation
+        out vec4 f_Color;   // 输出片元颜色 | Output fragment color
+        
+        void main(){
+            f_Color = vec4(v_Color, 1.0);
+        }
+    </script>
+
+    <!--Fragment lighting calculation-->
+    <!--Vertex Shader program-->
+    <script id="vertex-fShading" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_Position;
+        in vec3 a_Normal;   // 顶点法向(建模坐标系) | Vertex normal (modeling coordinate system)
+        out vec3 v_fN;      // 顶点法向(观察坐标系) | Vertex normal (observation coordinate system)
+        out vec3 v_fE;      // 观察向量(观察坐标系) | Observation vector (observation coordinate system)
+        out vec3 v_fL;      // 光源向量(观察坐标系) | Light source vector (observation coordinate system)
+
+        uniform mat4 u_matModel;    // 模型矩阵 | Model matrix
+        uniform mat4 u_matView;     // 观察矩阵 | Observation matrix
+        uniform mat4 u_matProj;     // 投影矩阵 | Projection matrix
+        uniform mat3 u_matNormal;   // 法向变换矩阵 | Normal transformation matrix
+        uniform vec4 u_LightPosition;   // 光源位置/方向(世界坐标系) | Light source position/direction (world coordinate system)
+
+        void main(){ 
+            // 将顶点坐标转换到观察坐标系下(在观察坐标系下计算光照) | Convert vertex coordinates to the viewing coordinate system (calculate lighting in the viewing coordinate system)
+            vec3 pos = (u_matView * u_matModel * vec4(a_Position, 1.0)).xyz;
+            v_fE = normalize(-pos); // 观察者向量方向 | Direction of the observer vector
+            v_fN = normalize(u_matNormal * a_Normal);
+            // 从顶点指向光源的向量(观察坐标系) | Vector pointing from the vertex to the light source (in the observation coordinate system)
+            v_fL = (u_matView * u_LightPosition).xyz;
+            if(u_LightPosition.w != 0.0){   // 近距离光源 | Near-distance light
+                v_fL = v_fL - pos.xyz;
+            }
+            v_fL = normalize(v_fL);
+            gl_Position = u_matProj * vec4(pos, 1.0);
+        }
+    </script>
+
+    <!--Fragment Shader Program-->
+    <script id="fragment-fShading" type="x-shader/x-fragment">
+        #version 300 es
+        precision mediump float;
+        in vec3 v_fN;       // 顶点法向(观察坐标系) | Vertex normal (observation coordinate system)
+        in vec3 v_fE;       // 观察向量(观察坐标系) | Observation vector (observation coordinate system)
+        in vec3 v_fL;       // 光源向量(观察坐标系) | Light source vector (observation coordinate system)
+        out vec4 f_Color;   // 输出片元颜色 | Output fragment color
+
+        uniform float u_Shininess;  // 高光系数 | Highlight coefficient
+        uniform vec3 u_AmbientProduct, u_DiffuseProduct, u_SpecularProduct;
+
+        void main(){
+            vec3 N = normalize(v_fN);
+            vec3 E = normalize(v_fE);
+            vec3 L = normalize(v_fL);
+            vec3 H = normalize(L + E);      // 半角向量 | Half-angle vector
+            vec3 ambient = u_AmbientProduct;// 环境反射分量 | Ambient component
+            // 漫反射分量 | Diffuse component
+            float Kd = max(dot(L, N), 0.0);
+            vec3 diffuse = Kd * u_DiffuseProduct;
+            // 镜面反射分量 | Specular component
+            vec3 specular;
+            if(Kd == 0.0){ specular = vec3(0.0, 0.0, 0.0); }
+            else {
+                float Ks = pow(max(dot(N, H), 0.0), u_Shininess);
+                specular = Ks * u_SpecularProduct;
+            }
+            f_Color = vec4(ambient + diffuse + specular, 1.0);
+        }
+    </script>
+
+    <script type="text/javascript" src="../Utils/initShaders.js"></script>
+    <script type="text/javascript" src="../Utils/MV.js"></script>
+    <script type="text/javascript" src="./Exp10-1LightShading.js"></script>
+</body>
+
+</html>

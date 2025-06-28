@@ -15,6 +15,7 @@ This repository contains various WebGL 2.0 experiments exploring different aspec
 - **Exp07**: Draw the solar system using the MVP Matrix stack
 - **Exp08**: Build a 3D scene camera walkthrough
 - **Exp09**: Pick up objects and create a board game
+- **Exp10**: Phong shading
 
 ## 🛠️ Technologies Used
 - WebGL 2.0
