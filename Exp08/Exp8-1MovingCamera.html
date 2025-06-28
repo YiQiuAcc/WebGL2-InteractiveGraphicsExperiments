@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Camera Tour</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #notice {
+            position: fixed;
+            left: 1%;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 20px;
+            color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="1000" height="700">
+        Your browser does not support HTML5 canvas elements!
+    </canvas>
+    <div>
+        <label id="notice">Press WASD or ↑←↓→ Move,Spacebar to jump,c or ctrl key to squat,Esc key to get out of the jam</label>
+    </div>
+    <!--The following are the shader programs and JavaScript programs used. The program type is determined by the type attribute.
+        Vertex Shader programs and fragment Shader programs have ids because they need to be accessed in JavaScript programs, 
+        but JavaScript programs do not have ids.-->
+    <!--Vertex Shader Program-->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+        in vec3 a_Position;
+        uniform mat4 u_MVPMatrix;
+        void main(){
+            // 计算裁剪坐标系下坐标 | Calculate the coordinates in the clipping coordinate system
+            gl_Position = u_MVPMatrix * vec4(a_Position, 1.0);    
+        }
+    </script>
+    <!--Fragment Shader Program-->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es 
+        precision mediump float;
+        uniform vec3 u_Color;    
+        out vec4 fColor;        
+        void main(){
+            fColor = vec4(u_Color, 1.0);
+        }
+    </script>
+    <script type="text/javascript" src="../Utils/initShaders.js"></script>
+    <script type="text/javascript" src="../Utils/MV.js"></script>
+    <script type="text/javascript" src="./Exp8-1MovingCamera.js"></script>
+</body>
+
+</html>
